@@ -1,0 +1,54 @@
+# Node modules
+node_modules/
+ 
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Binaries
+bin/
+obj/
+dist/
+build/
+ 
+# Coverage directory used by testing frameworks
+coverage/
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# NPM logs
+npm-debug.log*
+ 
+# PM2 specific files
+.pids
+logs/
+
+# Serverless Framework files
+.serverless/
+
+# MacOS specific files
+.DS_Store
+
+# Others
+*.log
+*.tsbuildinfo
