@@ -1,11 +1,19 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors'
 import connectDatabases from './infrastructure/database/mongoConnectDatabases';
 import router from './interface/http/routes';
 
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 
 app.use(express.json());
 
