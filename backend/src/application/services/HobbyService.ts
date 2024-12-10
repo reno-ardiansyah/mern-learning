@@ -1,5 +1,5 @@
 import { Hobby } from "../../domain/entities/Hobby";
-import { ManageHobbyUseCase } from "../usecases/ManageHobbyUseCase";
+import { ManageHobbyUseCase } from "../use-cases/ManageHobbyUseCase";
 
 export class HobbyService {
   constructor(private manageHobbyUseCase: ManageHobbyUseCase) {}

@@ -1,16 +1,18 @@
-// src/infrastructure/mongo/MongoPhoneNumberRepository.ts
 import { PhoneNumberRepository } from "../../domain/repositories/PhoneNumberRepository";
 import { PhoneNumber } from "../../domain/entities/PhoneNumber";
 import { MongoPhoneNumberModel } from "../orm/PhoneNumberModel";
 
 export class MongoPhoneNumberRepository implements PhoneNumberRepository {
   async findAll(): Promise<PhoneNumber[]> {
-    const phoneNumberDocs = await MongoPhoneNumberModel.find().exec();
-    return phoneNumberDocs.map(doc => new PhoneNumber(
+    const phoneNumberDocs = await MongoPhoneNumberModel.find()
+      .populate('peopleId', 'name')  // Menghubungkan peopleId dengan dokumen Person
+      .exec();
+    
+    return phoneNumberDocs.map((doc: any) => new PhoneNumber(
       doc._id?.toString(),
       doc.number,
       doc.type,
-      doc.peopleId?.toString(),
+      doc.peopleId ? { id: doc.peopleId._id.toString(), name: doc.peopleId.name } : null,
       doc.createdAt,
       doc.updatedAt
     ));
@@ -18,17 +20,18 @@ export class MongoPhoneNumberRepository implements PhoneNumberRepository {
 
   async findAllPaginated(page: number, limit: number): Promise<{ phoneNumbers: PhoneNumber[], totalCount: number }> {
     const phoneNumberDocs = await MongoPhoneNumberModel.find()
+      .populate('peopleId', 'name')  // Menghubungkan peopleId dengan dokumen Person
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
     const totalCount = await MongoPhoneNumberModel.countDocuments();
 
     return {
-      phoneNumbers: phoneNumberDocs.map(doc => new PhoneNumber(
+      phoneNumbers: phoneNumberDocs.map((doc: any) => new PhoneNumber(
         doc._id?.toString(),
         doc.number,
         doc.type,
-        doc.peopleId?.toString(),
+        doc.peopleId ? { id: doc.peopleId._id.toString(), name: doc.peopleId.name } : null,
         doc.createdAt,
         doc.updatedAt
       )),
@@ -43,7 +46,7 @@ export class MongoPhoneNumberRepository implements PhoneNumberRepository {
       doc._id?.toString(),
       doc.number,
       doc.type,
-      doc.peopleId?.toString(),
+      doc.peopleId ? { id: doc.peopleId.toString(), name: "" } : null,  // Memastikan people adalah null jika tidak ada
       doc.createdAt,
       doc.updatedAt
     );
@@ -56,7 +59,7 @@ export class MongoPhoneNumberRepository implements PhoneNumberRepository {
       doc._id?.toString(),
       doc.number,
       doc.type,
-      doc.peopleId?.toString(),
+      doc.peopleId ? { id: doc.peopleId.toString(), name: "" } : null,  // Memastikan people adalah null jika tidak ada
       doc.createdAt,
       doc.updatedAt
     );
@@ -66,7 +69,7 @@ export class MongoPhoneNumberRepository implements PhoneNumberRepository {
     const doc = new MongoPhoneNumberModel({
       number: phoneNumber.number,
       type: phoneNumber.type,
-      peopleId: phoneNumber.peopleId,
+      peopleId: phoneNumber.people?.id || null,  // Hanya menyimpan id dari objek people atau null
       createdAt: phoneNumber.createdAt,
       updatedAt: phoneNumber.updatedAt
     });
@@ -75,20 +78,25 @@ export class MongoPhoneNumberRepository implements PhoneNumberRepository {
       savedDoc._id?.toString(),
       savedDoc.number,
       savedDoc.type,
-      savedDoc.peopleId?.toString(),
+      savedDoc.peopleId ? { id: savedDoc.peopleId.toString(), name: "" } : null,  // Memastikan people adalah null jika tidak ada
       savedDoc.createdAt,
       savedDoc.updatedAt
     );
   }
 
   async update(id: string, phoneNumber: Partial<PhoneNumber>): Promise<PhoneNumber | null> {
-    const doc = await MongoPhoneNumberModel.findByIdAndUpdate(id, phoneNumber, { new: true }).exec();
+    const updateData = {
+      ...phoneNumber,
+      peopleId: phoneNumber.people?.id || null  // Mengupdate hanya id dari objek people atau null
+    };
+    
+    const doc = await MongoPhoneNumberModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
     if (!doc) return null;
     return new PhoneNumber(
       doc._id?.toString(),
       doc.number,
       doc.type,
-      doc.peopleId?.toString(),
+      doc.peopleId ? { id: doc.peopleId.toString(), name: "" } : null,  // Memastikan people adalah null jika tidak ada
       doc.createdAt,
       doc.updatedAt
     );

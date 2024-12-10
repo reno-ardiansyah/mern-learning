@@ -4,7 +4,7 @@ export class PhoneNumber {
     public id: string,
     public number: string,
     public type: string,
-    public peopleId: string,
+    public people: { id: string; name: string } | null, 
     public createdAt: Date,
     public updatedAt: Date
   ) {}

@@ -65,7 +65,17 @@ export class PhoneNumberController {
 
   async createPhoneNumber(req: Request, res: Response) {
     try {
-      const phoneNumber = await this.phoneNumberService.createPhoneNumber(req.body);
+      const phoneNumberData = {
+        number: req.body.number,
+        type: req.body.type,
+        people: {
+          id: req.body.peopleId,
+          name: req.body.peopleName
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      const phoneNumber = await this.phoneNumberService.createPhoneNumber(phoneNumberData);
       res.status(201).json(phoneNumber);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -74,7 +84,16 @@ export class PhoneNumberController {
 
   async updatePhoneNumber(req: Request, res: Response) {
     try {
-      const phoneNumber = await this.phoneNumberService.updatePhoneNumber(req.params.id, req.body);
+      const phoneNumberData = {
+        number: req.body.number,
+        type: req.body.type,
+        people: {
+          id: req.body.peopleId,
+          name: req.body.peopleName
+        },
+        updatedAt: new Date()
+      };
+      const phoneNumber = await this.phoneNumberService.updatePhoneNumber(req.params.id, phoneNumberData);
       if (phoneNumber) {
         res.json(phoneNumber);
       } else {

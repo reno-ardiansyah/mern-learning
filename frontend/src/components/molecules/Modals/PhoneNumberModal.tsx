@@ -7,7 +7,7 @@ import { IPerson } from "../../../services/peopleService";
 interface PhoneNumberModalProps {
   isOpen: boolean;
   isEdit: boolean;
-  initialValues?: { id: string; number: string; type: string; peopleId: string };
+  initialValues?: { id: string; number: string; type: string; people: { id: string; name: string } };
   onClose: () => void;
   onRefresh: () => void;
   availablePeople: IPerson[] | undefined;
@@ -18,20 +18,23 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({ isOpen, isEdit, ini
 
   useEffect(() => {
     if (isEdit && initialValues) {
-      form.setFieldsValue(initialValues);
+      form.setFieldsValue({
+        ...initialValues,
+        people: { key: initialValues.people.id, label: initialValues.people.name }
+      });
     } else {
       form.resetFields();
     }
   }, [isEdit, initialValues, isOpen]);
 
-  const handleSubmit = async (values: { number: string; type: string; peopleId: string }) => {
-    console.log('values', values);
+  const handleSubmit = async (values: { number: string; type: string; people: { key: string; label: string } }) => {
+    const { key: peopleId, label: peopleName } = values.people;
     try {
       if (isEdit) {
-        await phoneNumberService.updatePhoneNumber(initialValues?.id || "", values.number, values.type, values.peopleId);
+        await phoneNumberService.updatePhoneNumber(initialValues?.id || "", values.number, values.type, peopleId, peopleName);
         toast.success("PhoneNumber updated successfully!");
       } else {
-        await phoneNumberService.addPhoneNumber(values.number, values.type, values.peopleId);
+        await phoneNumberService.addPhoneNumber(values.number, values.type, peopleId);
         toast.success("PhoneNumber created successfully!");
       }
       onRefresh();
@@ -57,8 +60,12 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({ isOpen, isEdit, ini
           <Form.Item name="type" label="Type" rules={[{ required: true, message: "Type is required!" }]}>            
             <Input placeholder="Enter phone type" />
           </Form.Item>
-          <Form.Item name="peopleId" label="People ID" rules={[{ required: true, message: "Select a person!" }]}>
-            <Select placeholder="Select person">
+          <Form.Item name="people" label="Person" rules={[{ required: true, message: "Select a person!" }]}>
+            <Select
+              placeholder="Select person"
+              labelInValue
+              defaultValue={initialValues ? { key: initialValues.people.id, label: initialValues.people.name } : undefined}
+            >
               {availablePeople?.map((person) => (
                 <Select.Option key={person.id} value={person.id}>
                   {person.name}

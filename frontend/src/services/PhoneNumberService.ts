@@ -4,7 +4,7 @@ export interface IPhoneNumber {
   id: string;
   number: string;
   type: string;
-  peopleId: string;
+  people: { id: string; name: string };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,21 +26,21 @@ const getPhoneNumbers = async (page: number = 1, limit: number = 10, query: stri
 
 const getPhoneNumberById = async (id: string): Promise<IPhoneNumber> => {
   const response = await api.get(`${INITIAL_URL}/${id}`);
-  return response.data.data;
+  return response.data;
 };
 
 const addPhoneNumber = async (number: string, type: string, peopleId: string): Promise<IPhoneNumber> => {
   const response = await api.post(INITIAL_URL, { 
     number, 
     type, 
-    peopleId 
+    peopleId, 
   });
-  return response.data.data;
+  return response.data;
 };
 
-const updatePhoneNumber = async (id: string, number: string, type: string, peopleId: string): Promise<IPhoneNumber> => {
-  const response = await api.put(`${INITIAL_URL}/${id}`, { number, type, peopleId });
-  return response.data.data;
+const updatePhoneNumber = async (id: string, number: string, type: string, peopleId: string, peopleName: string): Promise<IPhoneNumber> => {
+  const response = await api.put(`${INITIAL_URL}/${id}`, { number, type, peopleId, peopleName });
+  return response.data;
 };
 
 const deletePhoneNumber = async (id: string): Promise<void> => {

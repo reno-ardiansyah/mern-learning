@@ -13,11 +13,22 @@ export class ManagePhoneNumberUseCase {
     return this.phoneNumberRepository.findById(id);
   }
 
-  async createPhoneNumber(phoneNumber: PhoneNumber): Promise<PhoneNumber> {
-    return this.phoneNumberRepository.save(phoneNumber);
+  async createPhoneNumber(phoneNumber: Omit<PhoneNumber, 'id'>): Promise<PhoneNumber> { // Menghapus 'id' karena 'id' akan dihasilkan oleh database
+    const phoneNumberEntity = new PhoneNumber(
+      '',
+      phoneNumber.number,
+      phoneNumber.type,
+      phoneNumber.people ? { id: phoneNumber.people.id, name: phoneNumber.people.name } : null,
+      phoneNumber.createdAt,
+      phoneNumber.updatedAt
+    );
+    return this.phoneNumberRepository.save(phoneNumberEntity);
   }
 
-  async updatePhoneNumber(id: string, phoneNumber: Partial<PhoneNumber>): Promise<PhoneNumber | null> {
+  async updatePhoneNumber(id: string, phoneNumber: Partial<Omit<PhoneNumber, 'id'>>): Promise<PhoneNumber | null> {
+    if (phoneNumber.people) {
+      phoneNumber.people = { id: phoneNumber.people.id, name: phoneNumber.people.name };
+    }
     return this.phoneNumberRepository.update(id, phoneNumber);
   }
 

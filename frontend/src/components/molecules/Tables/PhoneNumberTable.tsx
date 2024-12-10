@@ -20,7 +20,7 @@ const PhoneNumberTable: React.FC<PhoneNumberTableProps> = ({ data, onEdit, onDel
     },
     { title: "Number", dataIndex: "number" },
     { title: "Type", dataIndex: "type" },
-    { title: "People ID", dataIndex: "peopleId" },
+    { title: "Person", render: (record: IPhoneNumber) => record.people.name }, // Menampilkan nama orang
     { title: "Created At", render: (record: IPhoneNumber) => timeAgo(record.createdAt) },
     { title: "Updated At", render: (record: IPhoneNumber) => timeAgo(record.updatedAt) },
     {
