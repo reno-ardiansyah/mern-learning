@@ -2,25 +2,25 @@ import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PaginationControl from "../Pagination/PaginationControl";
 import Button from "../../atoms/Button/Button";
-import { IHobby } from "../../../services/hobbyService";
 import Search from "../../molecules/Search";
-import useFetchPeoples from "../../../hooks/useFetchPeoples";
-import PeopleTable from "../../molecules/Tables/PeopleTable";
-import personService from "../../../services/peopleService";
-import PeopleModal from "../../molecules/Modals/PeopleModal";
+import useFetchPhoneNumbers from "../../../hooks/useFetchPhoneNumbers";
+import PhoneNumberTable from "../../molecules/Tables/PhoneNumberTable";
+import phoneNumberService, { IPhoneNumber } from "../../../services/PhoneNumberService";
+import PhoneNumberModal from "../../molecules/Modals/PhoneNumberModal";
+// import { IPerson } from "../../../services/peopleService";
 
-const PeopleManager: React.FC = () => {
+const PhoneNumberManager: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { data, fetchData, allHobby, isLoading } = useFetchPeoples();
+  const { data, fetchData, allPeople, isLoading } = useFetchPhoneNumbers();
   const [modalState, setModalState] = useState({
     isOpen: false,
     isEdit: false,
     initialValues: undefined as
       | {
           id: string;
-          name: string;
-          age: number;
-          hobbies: IHobby[];
+          number: string;
+          type: string;
+          peopleId: string;
         }
       | undefined,
   });
@@ -31,8 +31,8 @@ const PeopleManager: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-3">
         <div>
-          <h3 className="text-3xl font-semibold">People Manager</h3>
-          <p className="">Manage your Peoples here</p>
+          <h3 className="text-3xl font-semibold">PhoneNumber Manager</h3>
+          <p className="">Manage your Phone Numbers here</p>
         </div>
         <div className="flex gap-3">
           <Search />
@@ -46,31 +46,28 @@ const PeopleManager: React.FC = () => {
               })
             }
           >
-            Add People
+            Add Phone Number
           </Button>
         </div>
       </div>
-      <PeopleTable
+      <PhoneNumberTable
         isLoading={isLoading}
-        data={data?.data}
-        onEdit={(item: any) => 
+        data={data?.phoneNumbers || []}
+        onEdit={(item: IPhoneNumber) =>
           setModalState({
             isOpen: true,
             isEdit: true,
             initialValues: {
               id: item.id,
-              name: item.name,
-              age: item.age,
-              hobbies: item.hobbies?.map((hobby: any) => ({
-                name: hobby.name,
-                id: hobby.id,
-              })) || [],
+              number: item.number,
+              type: item.type,
+              peopleId: item.peopleId,
             },
           })
         }
         pagination={{ page: currentPage, limit: currentLimit }}
         onDelete={async (id: string) => {
-          await personService.deletePerson(id);
+          await phoneNumberService.deletePhoneNumber(id);
           fetchData();
         }}
       />
@@ -79,16 +76,16 @@ const PeopleManager: React.FC = () => {
         total={data?.totalCount || 0}
         pageSize={currentLimit}
       />
-      <PeopleModal 
-          isOpen={modalState.isOpen}
-          isEdit={modalState.isEdit}
-          initialValues={modalState.initialValues}
-          onClose={() => setModalState({ isOpen: false, isEdit: false, initialValues: undefined })}
-          onRefresh={fetchData}
-          availableHobbies={allHobby}
+      <PhoneNumberModal 
+        isOpen={modalState.isOpen}
+        isEdit={modalState.isEdit}
+        initialValues={modalState.initialValues}
+        onClose={() => setModalState({ isOpen: false, isEdit: false, initialValues: undefined })}
+        onRefresh={fetchData}
+        availablePeople={allPeople}
       />
     </div>
   );
 };
 
-export default PeopleManager;
+export default PhoneNumberManager;

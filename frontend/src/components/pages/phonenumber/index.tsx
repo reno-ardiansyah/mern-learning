@@ -1,9 +1,10 @@
+import PhoneNumberManager from "../../organisms/Manager/PhoneNumberManager";
 import DashboardTemplate from "../../templates/DashboardTemplate";
 
 const PhoneNumber = () => {
 return (
   <DashboardTemplate>
-    <div>Phone Number</div>
+    <PhoneNumberManager />
   </DashboardTemplate>
 );
 }

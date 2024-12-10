@@ -30,6 +30,10 @@ export class PersonController {
     res.json(response);
   }
 
+  async getAllPersons(req: Request, res: Response): Promise<void>{
+    const persons = await this.personService.getAllPersons();
+  }
+
   async getPersonById(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
     const person = await this.personService.getPersonById(id);

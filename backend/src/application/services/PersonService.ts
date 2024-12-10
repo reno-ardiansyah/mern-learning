@@ -14,6 +14,11 @@ export class PersonService {
     ]);
     return { data: persons, totalCount };
   }
+  
+
+  public async getAllPersons(): Promise<Person[] | null > {
+    return this.personRepository.findAll()
+  }
 
   public async getPersonById(id: string): Promise<Person | null> {
     return this.personRepository.findById(id);
