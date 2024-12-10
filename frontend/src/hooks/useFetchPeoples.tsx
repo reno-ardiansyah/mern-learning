@@ -29,7 +29,7 @@ const useFetchPeoples = () => {
     setIsLoading(true);
     try {
       const res: any = await hobbyService.getAllHobbies()
-      setAllHoby(res.data);
+      setAllHoby(res.data.data);
     } catch (error: any) {
       console.error("Error fetching data:", error);
     } finally {

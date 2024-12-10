@@ -1,38 +1,30 @@
-import { HobbyRepository } from "../../domain/repositories/HobbyRepository";
 import { Hobby } from "../../domain/entities/Hobby";
+import { ManageHobbyUseCase } from "../usecases/ManageHobbyUseCase";
 
 export class HobbyService {
-  constructor(private hobbyRepository: HobbyRepository) {}
+  constructor(private manageHobbyUseCase: ManageHobbyUseCase) {}
 
-  async getHobbies(
-    page: number,
-    limit: number
-  ): Promise<{ data: Hobby[]; totalCount: number }> {
-    const [hobbies, totalCount] = await Promise.all([
-      this.hobbyRepository.findAllPaginated(page, limit),
-      this.hobbyRepository.count(),
-    ]);
-    return { data: hobbies, totalCount };
+  async getHobbies(page: number, limit: number) {
+    return this.manageHobbyUseCase.getHobbies(page, limit);
   }
 
-  async getAllHobbies(): Promise<Hobby[]> {
-    return this.hobbyRepository.findAll();
+  async getAllHobbies() {
+    return this.manageHobbyUseCase.getAllHobbies();
   }
 
-  async getHobbyById(id: string): Promise<Hobby | null> {
-    return this.hobbyRepository.findById(id);
+  async getHobbyById(id: string) {
+    return this.manageHobbyUseCase.getHobbyById(id);
   }
 
-  async addHobby(name: string, description: string): Promise<Hobby> {
-    const hobby = new Hobby("", name, description, new Date(), new Date());
-    return this.hobbyRepository.save(hobby);
+  async addHobby(name: string, description: string) {
+    return this.manageHobbyUseCase.addHobby(name, description);
   }
 
-  async updateHobby(id: string, hobby: Partial<Hobby>): Promise<Hobby | null> {
-    return this.hobbyRepository.update(id, hobby);
+  async updateHobby(id: string, hobbyData: Partial<Hobby>) {
+    return this.manageHobbyUseCase.updateHobby(id, hobbyData);
   }
 
-  async deleteHobby(id: string): Promise<void> {
-    await this.hobbyRepository.delete(id);
+  async deleteHobby(id: string) {
+    return this.manageHobbyUseCase.deleteHobby(id);
   }
 }

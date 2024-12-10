@@ -1,13 +1,21 @@
 import { Router } from 'express';
-import { HobbyService } from '../../../application/services/HobbyService';
+import { ManageHobbyUseCase } from '../../../application/usecases/ManageHobbyUseCase';
 import { MongoHobbyRepository } from '../../../infrastructure/repositories/MongoHobbyRepository';
 import { HobbyController } from '../controllers/HobbyController';
 
-const hobbyRouter = Router();
-const hobbyService = new HobbyService(new MongoHobbyRepository());
-const hobbyController = new HobbyController(hobbyService);
+// Inisialisasi Repository
+const hobbyRepository = new MongoHobbyRepository();
 
-hobbyRouter.get('/all', (req, res) => hobbyController.getAllHobbies(req, res))
+// Inisialisasi UseCase
+const manageHobbyUseCase = new ManageHobbyUseCase(hobbyRepository);
+
+// Inisialisasi Controller dengan UseCase
+const hobbyController = new HobbyController(manageHobbyUseCase);
+
+const hobbyRouter = Router();
+
+// Define Routes
+hobbyRouter.get('/all', (req, res) => hobbyController.getAllHobbies(req, res));
 hobbyRouter.get('/', (req, res) => hobbyController.getHobbies(req, res));
 hobbyRouter.get('/:id', (req, res) => hobbyController.getHobbyById(req, res));
 hobbyRouter.post('/', (req, res) => hobbyController.addHobby(req, res));

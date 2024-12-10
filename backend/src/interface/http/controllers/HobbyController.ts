@@ -1,41 +1,53 @@
 import { Request, Response } from 'express';
-import { HobbyService } from '../../../application/services/HobbyService';
+import { ManageHobbyUseCase } from '../../../application/usecases/ManageHobbyUseCase';
 import { CreateHobbyDto } from '../validators/HobbyValidation/CreateHobbyDto';
 import { UpdateHobbyDto } from '../validators/HobbyValidation/UpdateHobbyDto';
 import { validateOrReject } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
 export class HobbyController {
-  constructor(private hobbyService: HobbyService) {}
+  constructor(private manageHobbyUseCase: ManageHobbyUseCase) {}
 
   async getHobbies(req: Request, res: Response): Promise<void> {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const { data, totalCount } = await this.hobbyService.getHobbies(page, limit);
 
-    const response = {
-      status: 'success',
-      currentPage: page,
-      perPage: limit,
-      totalCount,
-      data,
-    };
+    try {
+      const { data, totalCount } = await this.manageHobbyUseCase.getHobbies(page, limit);
 
-    res.json(response);
+      res.status(200).json({
+        status: 'success',
+        currentPage: page,
+        perPage: limit,
+        totalCount,
+        data,
+      });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    }
   }
 
   async getAllHobbies(req: Request, res: Response): Promise<void> {
-    const data = await this.hobbyService.getAllHobbies()
-    res.json(data);
+    try {
+      const data = await this.manageHobbyUseCase.getAllHobbies();
+      res.status(200).json({ status: 'success', data });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    }
   }
 
   async getHobbyById(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
-    const hobby = await this.hobbyService.getHobbyById(id);
-    if (hobby) {
-      res.json({ status: 'success', data: hobby });
-    } else {
-      res.status(404).json({ status: 'error', message: 'Hobby not found' });
+    try {
+      const hobby = await this.manageHobbyUseCase.getHobbyById(id);
+
+      if (hobby) {
+        res.status(200).json({ status: 'success', data: hobby });
+      } else {
+        res.status(404).json({ status: 'error', message: 'Hobby not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Internal Server Error' });
     }
   }
 
@@ -44,7 +56,11 @@ export class HobbyController {
 
     try {
       await validateOrReject(createHobbyDto);
-      const newHobby = await this.hobbyService.addHobby(createHobbyDto.name, createHobbyDto.description);
+      const newHobby = await this.manageHobbyUseCase.addHobby(
+        createHobbyDto.name,
+        createHobbyDto.description
+      );
+
       res.status(201).json({ status: 'success', data: newHobby });
     } catch (errors) {
       res.status(400).json({ status: 'error', message: 'Validation failed', errors });
@@ -57,9 +73,13 @@ export class HobbyController {
 
     try {
       await validateOrReject(updateHobbyDto);
-      const updatedHobby = await this.hobbyService.updateHobby(id, req.body);
+      const updatedHobby = await this.manageHobbyUseCase.updateHobby(
+        id,
+        req.body
+      );
+
       if (updatedHobby) {
-        res.json({ status: 'success', data: updatedHobby });
+        res.status(200).json({ status: 'success', data: updatedHobby });
       } else {
         res.status(404).json({ status: 'error', message: 'Hobby not found' });
       }
@@ -70,7 +90,12 @@ export class HobbyController {
 
   async deleteHobby(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
-    await this.hobbyService.deleteHobby(id);
-    res.status(204).json({ status: 'success' });
+
+    try {
+      await this.manageHobbyUseCase.deleteHobby(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    }
   }
 }
