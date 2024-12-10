@@ -7,7 +7,6 @@ import useFetchPhoneNumbers from "../../../hooks/useFetchPhoneNumbers";
 import PhoneNumberTable from "../../molecules/Tables/PhoneNumberTable";
 import phoneNumberService, { IPhoneNumber } from "../../../services/PhoneNumberService";
 import PhoneNumberModal from "../../molecules/Modals/PhoneNumberModal";
-import { IPerson } from "../../../services/peopleService";
 
 const PhoneNumberManager: React.FC = () => {
   const [searchParams] = useSearchParams();

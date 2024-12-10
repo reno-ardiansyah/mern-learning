@@ -1,67 +1,31 @@
-import { PersonRepository } from '../../domain/repositories/PersonRepository';
+// src/application/services/PersonService.ts
+import { ManagePersonUseCase } from '../use-cases/ManagePersonUseCase';
 import { Person } from '../../domain/entities/Person';
-import { Hobby } from '../../domain/entities/Hobby';
 
 export class PersonService {
-  constructor(
-    private personRepository: PersonRepository
-  ) {}
+  constructor(private managePersonUseCase: ManagePersonUseCase) {}
 
   async getPersons(page: number, limit: number): Promise<{ data: Person[], totalCount: number }> {
-    const [persons, totalCount] = await Promise.all([
-      this.personRepository.findAllPaginated(page, limit),
-      this.personRepository.count()
-    ]);
-    return { data: persons, totalCount };
-  }
-  
-
-  public async getAllPersons(): Promise<Person[] | null > {
-    return this.personRepository.findAll()
+    return this.managePersonUseCase.getPersons(page, limit);
   }
 
-  public async getPersonById(id: string): Promise<Person | null> {
-    return this.personRepository.findById(id);
+  async getAllPersons(): Promise<Person[] | null> {
+    return this.managePersonUseCase.getAllPersons();
   }
 
-  async addPerson(
-    name: string,
-    age: number,
-    hobbies: string[]
-  ): Promise<Person> {
-    // Create hobbies entities
-    const hobbiesEntities = hobbies.map(
-      (id) => new Hobby(id, "", "", new Date(), new Date())
-    );
+  async getPersonById(id: string): Promise<Person | null> {
+    return this.managePersonUseCase.getPersonById(id);
+  }
 
-    // Create person entity
-    const person = new Person(
-      "",
-      name,
-      age,
-      hobbiesEntities,
-      null,
-      new Date(),
-      new Date()
-    );
-
-    // Save person
-    return this.personRepository.save(person);
+  async addPerson(name: string, age: number, hobbies: string[]): Promise<Person> {
+    return this.managePersonUseCase.addPerson(name, age, hobbies);
   }
 
   async updatePerson(id: string, person: any): Promise<Person | null> {
-    // If hobbies are an array of strings (IDs), map them to hobby entities
-    if (person.hobbies && Array.isArray(person.hobbies)) {
-      person.hobbies = person.hobbies.map(
-        (item: any) => new Hobby(item, "", "", new Date(), new Date())
-      );
-    }
-    
-    // Update person with the already-processed data
-    return this.personRepository.update(id, person);
+    return this.managePersonUseCase.updatePerson(id, person);
   }
 
   async deletePerson(id: string): Promise<void> {
-    await this.personRepository.delete(id);
+    return this.managePersonUseCase.deletePerson(id);
   }
 }

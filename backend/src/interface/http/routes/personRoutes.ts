@@ -1,10 +1,15 @@
 import { Router } from 'express';
 import { PersonService } from '../../../application/services/PersonService';
-import { MongoPersonRepository } from '../../../infrastructure/repositories/MongoPersonRepository';
 import { PersonController } from '../controllers/PersonController';
+import { ManagePersonUseCase } from '../../../application/use-cases/ManagePersonUseCase';
+import { MongoPersonRepository } from '../../../infrastructure/repositories/MongoPersonRepository';
 
 const personRouter = Router();
-const personService = new PersonService(new MongoPersonRepository());
+
+// Instantiate the repository, use case, service, and controller
+const personRepository = new MongoPersonRepository();
+const managePersonUseCase = new ManagePersonUseCase(personRepository);
+const personService = new PersonService(managePersonUseCase);
 const personController = new PersonController(personService);
 
 personRouter.get('/', (req, res) => personController.getPersons(req, res));
