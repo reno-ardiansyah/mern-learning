@@ -24,6 +24,11 @@ export class HobbyController {
     res.json(response);
   }
 
+  async getAllHobbies(req: Request, res: Response): Promise<void> {
+    const data = await this.hobbyService.getAllHobbies()
+    res.json(data);
+  }
+
   async getHobbyById(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
     const hobby = await this.hobbyService.getHobbyById(id);

@@ -21,6 +21,11 @@ const getHobbies = async (page: number = 1, limit: number = 10): Promise<IgetByP
   return response.data;
 };
 
+const getAllHobbies = async (): Promise<IHobby[]> => {
+  const response: any = await api.get('/hobbies/all');
+  return response;
+}
+
 const getHobbyById = async (id: string): Promise<IHobby> => {
   const response = await api.get(`/hobbies/${id}`);
   
@@ -43,6 +48,7 @@ const deleteHobby = async (id: string): Promise<void> => {
 
 const hobbyService = {
   getHobbies,
+  getAllHobbies,
   getHobbyById,
   addHobby,
   updateHobby,

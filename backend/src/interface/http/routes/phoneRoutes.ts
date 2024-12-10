@@ -1,17 +1,22 @@
 import { Router } from 'express';
-import { PhoneNumberService } from '../../../application/services/PhoneNumberService';
 import { MongoPhoneNumberRepository } from '../../../infrastructure/repositories/MongoPhoneNumberRepository';
-import { MongoPersonRepository } from '../../../infrastructure/repositories/MongoPersonRepository';
+import { ManagePhoneNumberUseCase } from '../../../application/usecases/ManagePhoneNumberUseCase';
+import { PhoneNumberService } from '../../../application/services/PhoneNumberService';
 import { PhoneNumberController } from '../controllers/PhoneNumberController';
 
-const phoneRouter = Router();
-const phoneNumberService = new PhoneNumberService(new MongoPhoneNumberRepository(), new MongoPersonRepository());
+const phoneNumberRouter = Router();
+
+const phoneNumberRepository = new MongoPhoneNumberRepository();
+const managePhoneNumberUseCase = new ManagePhoneNumberUseCase(phoneNumberRepository);
+const phoneNumberService = new PhoneNumberService(managePhoneNumberUseCase);
 const phoneNumberController = new PhoneNumberController(phoneNumberService);
 
-phoneRouter.get('/', (req, res) => phoneNumberController.getPhoneNumbers(req, res));
-phoneRouter.get('/:id', (req, res) => phoneNumberController.getPhoneNumberById(req, res));
-phoneRouter.post('/', (req, res) => phoneNumberController.addPhoneNumber(req, res));
-phoneRouter.put('/:id', (req, res) => phoneNumberController.updatePhoneNumber(req, res));
-phoneRouter.delete('/:id', (req, res) => phoneNumberController.deletePhoneNumber(req, res));
+phoneNumberRouter.get('/', (req, res) => phoneNumberController.getAllPhoneNumbers(req, res));
+phoneNumberRouter.get('/paginated', (req, res) => phoneNumberController.getPhoneNumbersPaginated(req, res));
+phoneNumberRouter.get('/:id', (req, res) => phoneNumberController.getPhoneNumberById(req, res));
+phoneNumberRouter.get('/number/:number', (req, res) => phoneNumberController.getPhoneNumberByNumber(req, res));
+phoneNumberRouter.post('/', (req, res) => phoneNumberController.createPhoneNumber(req, res));
+phoneNumberRouter.put('/:id', (req, res) => phoneNumberController.updatePhoneNumber(req, res));
+phoneNumberRouter.delete('/:id', (req, res) => phoneNumberController.deletePhoneNumber(req, res));
 
-export { phoneRouter };
+export { phoneNumberRouter };

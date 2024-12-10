@@ -1,4 +1,4 @@
-import HobbyManager from "../../organisms/HobbyManager";
+import HobbyManager from "../../organisms/Manager/hobbyTableLayout";
 import DashboardTemplate from "../../templates/DashboardTemplate";
 
 const Hobbies = () => {

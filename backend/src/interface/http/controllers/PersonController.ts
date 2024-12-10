@@ -22,7 +22,6 @@ export class PersonController {
         name: person.name,
         age: person.age,
         hobbies: person.hobbies,
-        phoneNumber: person.phoneNumber,
         createdAt: person.createdAt,
         updatedAt: person.updatedAt,
       })),
@@ -42,7 +41,6 @@ export class PersonController {
           name: person.name,
           age: person.age,
           hobbies: person.hobbies,
-          phoneNumber: person.phoneNumber,
           createdAt: person.createdAt,
           updatedAt: person.updatedAt,
         },
@@ -53,29 +51,26 @@ export class PersonController {
   }
 
   async addPerson(req: Request, res: Response): Promise<void> {
-    const { name, age, hobbies, phoneNumber } = req.body;
+    const { name, age, hobbies } = req.body;
     if (
       typeof name !== "string" ||
       typeof age !== "number" ||
       !Array.isArray(hobbies) ||
-      typeof phoneNumber !== "string" ||
       !name ||
       !age ||
-      !hobbies.length ||
-      !phoneNumber
+      !hobbies.length
     ) {
       res.status(400).json({
         status: "error",
         message:
-          "name harus string, age harus number, hobbies harus array, phoneNumber harus string dan tidak boleh kosong",
+          "name harus string, age harus number, hobbies harus array dan tidak boleh kosong",
       });
       return;
     }
     const newPerson = await this.personService.addPerson(
       name,
       age,
-      hobbies,
-      phoneNumber
+      hobbies
     );
     res.status(201).json({
       status: "success",
@@ -84,7 +79,6 @@ export class PersonController {
         name: newPerson.name,
         age: newPerson.age,
         hobbies: newPerson.hobbies,
-        phoneNumber: newPerson.phoneNumber,
         createdAt: newPerson.createdAt,
         updatedAt: newPerson.updatedAt,
       },
@@ -103,7 +97,6 @@ export class PersonController {
           name: updatedPerson.name,
           age: updatedPerson.age,
           hobbies: updatedPerson.hobbies,
-          phoneNumber: updatedPerson.phoneNumber,
           createdAt: updatedPerson.createdAt,
           updatedAt: updatedPerson.updatedAt,
         },

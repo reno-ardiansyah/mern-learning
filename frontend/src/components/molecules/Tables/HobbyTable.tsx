@@ -12,6 +12,8 @@ interface HobbyTableProps {
 }
 
 const HobbyTable: React.FC<HobbyTableProps> = ({ data, onEdit, onDelete, pagination, isLoading }) => {
+  console.log(data);
+  
   const columns = [
     {
       title: "Index",

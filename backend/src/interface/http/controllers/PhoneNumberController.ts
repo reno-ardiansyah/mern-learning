@@ -1,53 +1,96 @@
-import { Request, Response } from 'express';
-import { PhoneNumberService } from '../../../application/services/PhoneNumberService';
+// src/presentation/controllers/PhoneNumberController.ts
+import { Request, Response } from "express";
+import { PhoneNumberService } from "../../../application/services/PhoneNumberService";
 
 export class PhoneNumberController {
   constructor(private phoneNumberService: PhoneNumberService) {}
 
-  async getPhoneNumbers(req: Request, res: Response): Promise<void> {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const { data, totalCount } = await this.phoneNumberService.getPhoneNumbers(page, limit);
-
-    res.json({
-      status: 'success',
-      currentPage: page,
-      perPage: limit,
-      totalCount,
-      data,
-    });
-  }
-
-  async getPhoneNumberById(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
-    const phoneNumber = await this.phoneNumberService.getPhoneNumberById(id);
-    if (phoneNumber) {
-      res.json({ status: 'success', data: phoneNumber });
-    } else {
-      res.status(404).json({ status: 'error', message: 'PhoneNumber not found' });
+  async getAllPhoneNumbers(req: Request, res: Response) {
+    try {
+      const phoneNumbers = await this.phoneNumberService.getAllPhoneNumbers();
+      res.json({
+        status: "success",
+        currentPage: 1, // Jika menggunakan paginasi, ganti nilai ini sesuai
+        perPage: phoneNumbers.length, // Total item dalam hasil ini
+        totalCount: phoneNumbers.length, // Total item yang ditemukan
+        phoneNumbers
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async addPhoneNumber(req: Request, res: Response): Promise<void> {
-    const { personId, number, type } = req.body;
-    const newPhoneNumber = await this.phoneNumberService.addPhoneNumber(personId, number, type);
-    res.status(201).json({ status: 'success', data: newPhoneNumber });
-  }
-
-  async updatePhoneNumber(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
-    const { number, type } = req.body;
-    const updatedPhoneNumber = await this.phoneNumberService.updatePhoneNumber(id, number, type);
-    if (updatedPhoneNumber) {
-      res.json({ status: 'success', data: updatedPhoneNumber });
-    } else {
-      res.status(404).json({ status: 'error', message: 'PhoneNumber not found' });
+  async getPhoneNumbersPaginated(req: Request, res: Response) {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+      const { phoneNumbers, totalCount } = await this.phoneNumberService.getPhoneNumbersPaginated(page, limit);
+      res.json({
+        status: "success",
+        currentPage: page,
+        perPage: limit,
+        totalCount,
+        phoneNumbers
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async deletePhoneNumber(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
-    await this.phoneNumberService.deletePhoneNumber(id);
-    res.status(204).json({ status: 'success' });
+  async getPhoneNumberById(req: Request, res: Response) {
+    try {
+      const phoneNumber = await this.phoneNumberService.getPhoneNumberById(req.params.id);
+      if (phoneNumber) {
+        res.json(phoneNumber);
+      } else {
+        res.status(404).json({ message: "PhoneNumber not found" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getPhoneNumberByNumber(req: Request, res: Response) {
+    try {
+      const phoneNumber = await this.phoneNumberService.getPhoneNumberByNumber(req.params.number);
+      if (phoneNumber) {
+        res.json(phoneNumber);
+      } else {
+        res.status(404).json({ message: "PhoneNumber not found" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async createPhoneNumber(req: Request, res: Response) {
+    try {
+      const phoneNumber = await this.phoneNumberService.createPhoneNumber(req.body);
+      res.status(201).json(phoneNumber);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async updatePhoneNumber(req: Request, res: Response) {
+    try {
+      const phoneNumber = await this.phoneNumberService.updatePhoneNumber(req.params.id, req.body);
+      if (phoneNumber) {
+        res.json(phoneNumber);
+      } else {
+        res.status(404).json({ message: "PhoneNumber not found" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async deletePhoneNumber(req: Request, res: Response) {
+    try {
+      await this.phoneNumberService.deletePhoneNumber(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   }
 }

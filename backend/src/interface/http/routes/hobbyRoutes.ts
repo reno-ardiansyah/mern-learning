@@ -7,6 +7,7 @@ const hobbyRouter = Router();
 const hobbyService = new HobbyService(new MongoHobbyRepository());
 const hobbyController = new HobbyController(hobbyService);
 
+hobbyRouter.get('/all', (req, res) => hobbyController.getAllHobbies(req, res))
 hobbyRouter.get('/', (req, res) => hobbyController.getHobbies(req, res));
 hobbyRouter.get('/:id', (req, res) => hobbyController.getHobbyById(req, res));
 hobbyRouter.post('/', (req, res) => hobbyController.addHobby(req, res));
